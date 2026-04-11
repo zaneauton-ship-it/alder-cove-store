@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shop Vanities · Alder & Cove</title>
+  <meta name="description" content="Alder & Cove offers curated bathroom vanities with a refined, architectural point of view." />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="assets/styles.css" />
+  
+</head>
+<body>
+  
+<main>
+  <section class="section">
+    <div class="container">
+      <div class="eyebrow">Shop the collection</div>
+      <h1>Bathroom vanities, curated with a cleaner eye.</h1>
+      <p class="muted" style="max-width:700px">Explore freestanding and wall-mounted vanity styles selected for warmth, balance, and straightforward everyday use.</p>
+      <div class="filters">
+        <input class="search-input" id="search" type="search" placeholder="Search by name, finish, material, or collection" />
+        <select id="mount-filter">
+          <option value="">All mounts</option>
+          <option value="Freestanding">Freestanding</option>
+          <option value="Wall-Mounted">Wall-Mounted</option>
+        </select>
+        <select id="width-filter">
+          <option value="">All widths</option>
+          <option value="small">Under 36&quot;</option>
+          <option value="medium">36&quot;–48&quot;</option>
+          <option value="large">Over 48&quot;</option>
+        </select>
+        <select id="sort-filter">
+          <option value="featured">Featured</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="rating-desc">Top Rated</option>
+        </select>
+      </div>
+      <div class="results-summary" id="results-summary"></div>
+      <div id="product-grid" class="grid grid-3"></div>
+    </div>
+  </section>
+</main>
+
+  <script src="assets/config.js"></script>
+  
+  <script src="assets/app.js"></script>
+</body>
+</html>

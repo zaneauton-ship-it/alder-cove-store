@@ -1,0 +1,9 @@
+{
+  "name": "alder-cove-storefront",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "stripe": "^18.6.0"
+  }
+}
