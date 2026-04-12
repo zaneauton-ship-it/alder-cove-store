@@ -451,8 +451,7 @@ const App = (() => {
     relatedMount.innerHTML = related.map(productCard).join('');
     wireAddToCart(relatedMount);
   }
-
-  async function renderCheckoutPage() {
+async function renderCheckoutPage() {
     const mount = document.querySelector('#checkout-page');
     if (!mount) return;
     await loadCatalog();
@@ -534,7 +533,8 @@ const App = (() => {
         const checkout = await stripe.initEmbeddedCheckout({clientSecret});
         checkout.mount('#checkout');
       } else {
-        throw new Error('Stripe embedded checkout 
+        throw new Error('Stripe embedded checkout
+   
 
   async function renderSuccessPage() {
     const mount = document.querySelector('#success-page');
