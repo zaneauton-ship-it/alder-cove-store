@@ -534,12 +534,7 @@ const App = (() => {
         const checkout = await stripe.initEmbeddedCheckout({clientSecret});
         checkout.mount('#checkout');
       } else {
-        throw new Error('Stripe embedded checkout is not available in this Stripe.js build');
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
+        throw new Error('Stripe embedded checkout 
 
   async function renderSuccessPage() {
     const mount = document.querySelector('#success-page');
