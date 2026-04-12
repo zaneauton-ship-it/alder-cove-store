@@ -1,4 +1,3 @@
-
 const App = (() => {
   const state = {
     catalog: null,
@@ -6,7 +5,8 @@ const App = (() => {
     cart: JSON.parse(localStorage.getItem('ac_cart') || '[]')
   };
 
-  const money = (value) => new Intl.NumberFormat('en-US', {style:'currency', currency:'USD'}).format(value || 0);
+  const money = (value) =>
+    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value || 0);
 
   async function loadCatalog() {
     if (state.catalog) return state.catalog;
@@ -27,16 +27,16 @@ const App = (() => {
 
   async function getProduct(id) {
     await loadCatalog();
-    return state.products.find(p => p.id === id);
+    return state.products.find((p) => p.id === id);
   }
 
   async function getProductBySlug(slug) {
     await loadCatalog();
-    return state.products.find(p => p.slug === slug);
+    return state.products.find((p) => p.slug === slug);
   }
 
   async function addToCart(productId, quantity = 1) {
-    const existing = state.cart.find(item => item.id === productId);
+    const existing = state.cart.find((item) => item.id === productId);
     if (existing) existing.quantity += quantity;
     else state.cart.push({ id: productId, quantity });
     saveCart();
@@ -44,23 +44,27 @@ const App = (() => {
   }
 
   function setQuantity(productId, quantity) {
-    const item = state.cart.find(i => i.id === productId);
+    const item = state.cart.find((i) => i.id === productId);
     if (!item) return;
     item.quantity = Math.max(1, quantity);
     saveCart();
   }
 
   function removeFromCart(productId) {
-    state.cart = state.cart.filter(item => item.id !== productId);
+    state.cart = state.cart.filter((item) => item.id !== productId);
     saveCart();
   }
 
   async function getCartDetailed() {
     await loadCatalog();
-    return state.cart.map(item => {
-      const product = state.products.find(p => p.id === item.id);
-      return product ? {...product, quantity: item.quantity, lineTotal: product.price * item.quantity } : null;
-    }).filter(Boolean);
+    return state.cart
+      .map((item) => {
+        const product = state.products.find((p) => p.id === item.id);
+        return product
+          ? { ...product, quantity: item.quantity, lineTotal: product.price * item.quantity }
+          : null;
+      })
+      .filter(Boolean);
   }
 
   function cartSubtotal(items) {
@@ -161,9 +165,10 @@ const App = (() => {
     document.body.insertAdjacentHTML('beforeend', cartDrawerMarkup());
     document.body.insertAdjacentHTML('beforeend', footerMarkup());
 
-    document.querySelectorAll('.nav a').forEach(link => {
+    document.querySelectorAll('.nav a').forEach((link) => {
       if (link.dataset.page === currentPage()) link.classList.add('active');
     });
+
     const year = document.getElementById('year');
     if (year) year.textContent = new Date().getFullYear();
 
@@ -194,8 +199,13 @@ const App = (() => {
   }
 
   function productCard(product) {
-    const compare = product.compareAt ? `<span class="compare-price">${money(product.compareAt)}</span>` : '';
-    const rating = product.rating ? `<div class="rating">${stars(product.rating)} · ${product.reviewCount} reviews</div>` : '';
+    const compare = product.compareAt
+      ? `<span class="compare-price">${money(product.compareAt)}</span>`
+      : '';
+    const rating = product.rating
+      ? `<div class="rating">${stars(product.rating)} · ${product.reviewCount} reviews</div>`
+      : '';
+
     return `
       <article class="product-card">
         <a class="image-wrap" href="product.html?slug=${encodeURIComponent(product.slug)}">
@@ -224,7 +234,7 @@ const App = (() => {
   }
 
   function wireAddToCart(scope = document) {
-    scope.querySelectorAll('[data-add-cart]').forEach(btn => {
+    scope.querySelectorAll('[data-add-cart]').forEach((btn) => {
       btn.addEventListener('click', async () => {
         btn.disabled = true;
         await addToCart(btn.dataset.addCart, 1);
@@ -243,12 +253,16 @@ const App = (() => {
     if (!itemsEl || !subtotalEl) return;
 
     const items = await getCartDetailed();
+
     if (!items.length) {
       itemsEl.innerHTML = `<div class="empty-state">Your cart is empty for now. Start with a vanity that fits your space and finish preference.</div>`;
       subtotalEl.textContent = money(0);
       return;
     }
-    itemsEl.innerHTML = items.map(item => `
+
+    itemsEl.innerHTML = items
+      .map(
+        (item) => `
       <div class="cart-item">
         <img src="${item.image}" alt="${item.name}" />
         <div>
@@ -266,26 +280,34 @@ const App = (() => {
           <div style="margin-top:10px"><button class="remove-link" type="button" data-remove-cart="${item.id}">Remove</button></div>
         </div>
       </div>
-    `).join('');
+    `
+      )
+      .join('');
+
     subtotalEl.textContent = money(cartSubtotal(items));
 
-    itemsEl.querySelectorAll('[data-remove-cart]').forEach(btn => {
+    itemsEl.querySelectorAll('[data-remove-cart]').forEach((btn) => {
       btn.addEventListener('click', () => removeFromCart(btn.dataset.removeCart));
     });
-    itemsEl.querySelectorAll('[data-qty-minus]').forEach(btn => {
+
+    itemsEl.querySelectorAll('[data-qty-minus]').forEach((btn) => {
       btn.addEventListener('click', () => {
-        const found = state.cart.find(i => i.id === btn.dataset.qtyMinus);
+        const found = state.cart.find((i) => i.id === btn.dataset.qtyMinus);
         if (found) setQuantity(found.id, Math.max(1, found.quantity - 1));
       });
     });
-    itemsEl.querySelectorAll('[data-qty-plus]').forEach(btn => {
+
+    itemsEl.querySelectorAll('[data-qty-plus]').forEach((btn) => {
       btn.addEventListener('click', () => {
-        const found = state.cart.find(i => i.id === btn.dataset.qtyPlus);
+        const found = state.cart.find((i) => i.id === btn.dataset.qtyPlus);
         if (found) setQuantity(found.id, found.quantity + 1);
       });
     });
-    itemsEl.querySelectorAll('[data-qty-input]').forEach(input => {
-      input.addEventListener('change', () => setQuantity(input.dataset.qtyInput, parseInt(input.value, 10) || 1));
+
+    itemsEl.querySelectorAll('[data-qty-input]').forEach((input) => {
+      input.addEventListener('change', () =>
+        setQuantity(input.dataset.qtyInput, parseInt(input.value, 10) || 1)
+      );
     });
   }
 
@@ -294,26 +316,33 @@ const App = (() => {
     const target = document.querySelector(selector);
     if (!target) return;
     const ids = state.catalog.featured || [];
-    const items = ids.map(id => state.products.find(p => p.id === id)).filter(Boolean).slice(0, limit);
+    const items = ids
+      .map((id) => state.products.find((p) => p.id === id))
+      .filter(Boolean)
+      .slice(0, limit);
+
     target.innerHTML = items.map(productCard).join('');
     wireAddToCart(target);
   }
 
   async function renderShop() {
     await loadCatalog();
+
     const grid = document.querySelector('#product-grid');
     const search = document.querySelector('#search');
     const mount = document.querySelector('#mount-filter');
     const width = document.querySelector('#width-filter');
     const sort = document.querySelector('#sort-filter');
     const summary = document.querySelector('#results-summary');
+
     if (!grid) return;
 
     const draw = () => {
       let results = [...state.products];
       const q = (search?.value || '').trim().toLowerCase();
+
       if (q) {
-        results = results.filter(product =>
+        results = results.filter((product) =>
           [product.name, product.description, product.finish, product.material, product.collection]
             .filter(Boolean)
             .join(' ')
@@ -321,9 +350,11 @@ const App = (() => {
             .includes(q)
         );
       }
-      if (mount?.value) results = results.filter(product => product.mount === mount.value);
+
+      if (mount?.value) results = results.filter((product) => product.mount === mount.value);
+
       if (width?.value) {
-        results = results.filter(product => {
+        results = results.filter((product) => {
           const w = product.widthInches || 0;
           if (width.value === 'small') return w > 0 && w < 36;
           if (width.value === 'medium') return w >= 36 && w <= 48;
@@ -331,36 +362,51 @@ const App = (() => {
           return true;
         });
       }
-      if (sort?.value === 'price-asc') results.sort((a,b) => a.price - b.price);
-      if (sort?.value === 'price-desc') results.sort((a,b) => b.price - a.price);
-      if (sort?.value === 'rating-desc') results.sort((a,b) => (b.rating || 0) - (a.rating || 0));
+
+      if (sort?.value === 'price-asc') results.sort((a, b) => a.price - b.price);
+      if (sort?.value === 'price-desc') results.sort((a, b) => b.price - a.price);
+      if (sort?.value === 'rating-desc') results.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+
       if (sort?.value === 'featured') {
         const featuredSet = new Set(state.catalog.featured || []);
-        results.sort((a,b) => Number(featuredSet.has(b.id)) - Number(featuredSet.has(a.id)));
+        results.sort((a, b) => Number(featuredSet.has(b.id)) - Number(featuredSet.has(a.id)));
       }
+
       summary.textContent = `${results.length} vanity${results.length === 1 ? '' : 'ies'} available`;
-      grid.innerHTML = results.length ? results.map(productCard).join('') : `<div class="empty-state">No products match that filter combination yet.</div>`;
+      grid.innerHTML = results.length
+        ? results.map(productCard).join('')
+        : `<div class="empty-state">No products match that filter combination yet.</div>`;
+
       wireAddToCart(grid);
     };
 
-    [search, mount, width, sort].forEach(el => el?.addEventListener('input', draw));
-    [mount, width, sort].forEach(el => el?.addEventListener('change', draw));
+    [search, mount, width, sort].forEach((el) => el?.addEventListener('input', draw));
+    [mount, width, sort].forEach((el) => el?.addEventListener('change', draw));
+
     draw();
   }
 
   async function renderProductPage() {
     const mount = document.querySelector('#product-page');
     if (!mount) return;
+
     await loadCatalog();
+
     const params = new URLSearchParams(location.search);
     const slug = params.get('slug');
     const product = await getProductBySlug(slug);
+
     if (!product) {
       mount.innerHTML = `<div class="empty-state">That product could not be found.</div>`;
       return;
     }
+
     document.title = `${product.name} · Alder & Cove`;
-    const compare = product.compareAt ? `<span class="compare-price">${money(product.compareAt)}</span>` : '';
+
+    const compare = product.compareAt
+      ? `<span class="compare-price">${money(product.compareAt)}</span>`
+      : '';
+
     mount.innerHTML = `
       <section class="section">
         <div class="container product-layout">
@@ -407,7 +453,7 @@ const App = (() => {
           <div class="panel pad">
             <div class="eyebrow">Highlights</div>
             <h2>Designed for refined daily use</h2>
-            <ul class="feature-list">${product.features.map(item => `<li>${item}</li>`).join('')}</ul>
+            <ul class="feature-list">${product.features.map((item) => `<li>${item}</li>`).join('')}</ul>
           </div>
           <div class="panel pad">
             <div class="eyebrow">Assurance</div>
@@ -435,27 +481,33 @@ const App = (() => {
       const input = document.getElementById('product-qty');
       input.value = Math.max(1, (parseInt(input.value, 10) || 1) - 1);
     });
+
     document.getElementById('qty-plus').addEventListener('click', () => {
       const input = document.getElementById('product-qty');
       input.value = (parseInt(input.value, 10) || 1) + 1;
     });
+
     document.getElementById('add-product-cart').addEventListener('click', async () => {
       const qty = parseInt(document.getElementById('product-qty').value, 10) || 1;
       await addToCart(product.id, qty);
     });
 
     const related = state.products
-      .filter(item => item.id !== product.id && (item.mount === product.mount || item.widthInches === product.widthInches))
-      .slice(0,3);
+      .filter((item) => item.id !== product.id && (item.mount === product.mount || item.widthInches === product.widthInches))
+      .slice(0, 3);
+
     const relatedMount = document.getElementById('related-products');
     relatedMount.innerHTML = related.map(productCard).join('');
     wireAddToCart(relatedMount);
   }
-async function renderCheckoutPage() {
+
+  async function renderCheckoutPage() {
     const mount = document.querySelector('#checkout-page');
     if (!mount) return;
+
     await loadCatalog();
     const items = await getCartDetailed();
+
     if (!items.length) {
       mount.innerHTML = `
         <section class="section">
@@ -470,7 +522,9 @@ async function renderCheckoutPage() {
       `;
       return;
     }
+
     const subtotal = cartSubtotal(items);
+
     mount.innerHTML = `
       <section class="section">
         <div class="container checkout-shell">
@@ -478,31 +532,38 @@ async function renderCheckoutPage() {
             <div class="eyebrow">Order summary</div>
             <h2>Checkout</h2>
             <div class="table-like">
-              ${items.map(item => `
+              ${items
+                .map(
+                  (item) => `
                 <div class="row">
                   <div>
                     <strong>${item.name}</strong>
                     <div class="small">Qty ${item.quantity}</div>
                   </div>
                   <strong>${money(item.lineTotal)}</strong>
-                </div>`).join('')}
+                </div>
+              `
+                )
+                .join('')}
               <div class="row"><span>Subtotal</span><strong>${money(subtotal)}</strong></div>
               <div class="row"><span>Taxes</span><strong>Calculated in checkout</strong></div>
               <div class="row"><span>Processing time</span><strong>72 hours</strong></div>
             </div>
-            <p class="small" style="margin-top:16px">U.S. checkout only at launch. Automated tax collection should be enabled in Stripe before going live.</p>
+            <p class="small" style="margin-top:16px">U.S. checkout only at launch.</p>
           </aside>
+
           <div>
             <div class="panel pad" style="margin-bottom:18px">
               <div class="eyebrow">Secure payment</div>
               <h2>Embedded Stripe checkout</h2>
-              <p class="muted">This storefront is wired for embedded Stripe Checkout. Once your Stripe keys and Pages Function environment variables are added, the payment form mounts below.</p>
+              <p class="muted">Your secure payment form should load below.</p>
             </div>
+
             <div id="checkout-container" class="panel pad">
               <div id="checkout"></div>
               <div class="checkout-placeholder" id="checkout-fallback">
-                <strong>Stripe setup pending</strong>
-                <p class="muted">Add your publishable key in <code>assets/config.js</code> and your secret key as <code>STRIPE_SECRET_KEY</code> in Cloudflare Pages. Then this page will create a Checkout Session and mount the embedded form automatically.</p>
+                <strong>Loading checkout…</strong>
+                <p class="muted">Please wait while we connect to Stripe.</p>
               </div>
             </div>
           </div>
@@ -510,37 +571,73 @@ async function renderCheckoutPage() {
       </section>
     `;
 
-    if (!window.STORE_CONFIG?.stripePublishableKey || window.STORE_CONFIG.stripePublishableKey.includes('replace_me')) return;
+    if (
+      !window.STORE_CONFIG?.stripePublishableKey ||
+      window.STORE_CONFIG.stripePublishableKey.includes('replace_me')
+    ) {
+      const fallback = document.getElementById('checkout-fallback');
+      if (fallback) {
+        fallback.innerHTML = `
+          <strong>Missing Stripe publishable key</strong>
+          <p class="muted">window.STORE_CONFIG.stripePublishableKey is missing.</p>
+        `;
+      }
+      return;
+    }
 
     try {
-      if (!window.Stripe) throw new Error('Stripe.js not loaded');
+      if (!window.Stripe) {
+        throw new Error('Stripe.js not loaded');
+      }
+
       const stripe = window.Stripe(window.STORE_CONFIG.stripePublishableKey);
 
-      const response = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({
-          cart: state.cart
-        })
+      const fetchClientSecret = async () => {
+        const response = await fetch('/api/create-checkout-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cart: state.cart })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Unable to create checkout session');
+        }
+
+        if (!data.clientSecret) {
+          throw new Error('Missing client secret');
+        }
+
+        return data.clientSecret;
+      };
+
+      const checkout = await stripe.createEmbeddedCheckoutPage({
+        fetchClientSecret
       });
-      if (!response.ok) throw new Error('Unable to create checkout session');
-      const { clientSecret } = await response.json();
-      if (!clientSecret) throw new Error('Missing client secret');
 
       document.getElementById('checkout-fallback')?.remove();
+      checkout.mount('#checkout');
+    } catch (error) {
+      console.error('Stripe checkout error:', error);
 
-      if (stripe.initEmbeddedCheckout) {
-        const checkout = await stripe.initEmbeddedCheckout({clientSecret});
-        checkout.mount('#checkout');
-      } else {
-        throw new Error('Stripe embedded checkout
-   
+      const fallback = document.getElementById('checkout-fallback');
+      if (fallback) {
+        fallback.innerHTML = `
+          <strong>Checkout failed to load</strong>
+          <p class="muted">${error.message || 'Unknown error'}</p>
+        `;
+      }
+    }
+  }
 
   async function renderSuccessPage() {
     const mount = document.querySelector('#success-page');
     if (!mount) return;
+
     const params = new URLSearchParams(location.search);
     const sessionId = params.get('session_id');
+
     mount.innerHTML = `
       <section class="section">
         <div class="container">
@@ -556,23 +653,29 @@ async function renderCheckoutPage() {
         </div>
       </section>
     `;
+
     if (!sessionId) {
-      document.getElementById('session-status').textContent = 'We could not find a session ID on this return page.';
+      document.getElementById('session-status').textContent =
+        'We could not find a session ID on this return page.';
       return;
     }
+
     try {
       const res = await fetch(`/api/session-status?session_id=${encodeURIComponent(sessionId)}`);
       const data = await res.json();
       const statusEl = document.getElementById('session-status');
+
       if (data.status === 'complete') {
         statusEl.innerHTML = `Payment complete for <strong>${data.customer_email || 'your order'}</strong>. A confirmation email will arrive from Stripe, and Alder & Cove will begin processing within 72 hours.`;
         state.cart = [];
         saveCart();
       } else {
-        statusEl.textContent = 'Your payment is still processing. If you need help, email info@foothillslistings.online.';
+        statusEl.textContent =
+          'Your payment is still processing. If you need help, email info@foothillslistings.online.';
       }
     } catch (error) {
-      document.getElementById('session-status').textContent = 'We could not verify the session yet. If you have a payment confirmation, your order is likely still being processed.';
+      document.getElementById('session-status').textContent =
+        'We could not verify the session yet. If you have a payment confirmation, your order is likely still being processed.';
     }
   }
 
