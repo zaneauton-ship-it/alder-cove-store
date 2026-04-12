@@ -58,22 +58,7 @@ export async function onRequestPost(context) {
         enabled: false
       },
       redirect_on_completion: 'always',
-      branding_settings: {
-        display_name: 'Alder & Cove',
-        background_color: '#f4f1ea',
-        button_color: '#2f3132',
-        border_style: 'rounded',
-        font_family: 'pt_serif',
-        icon: {
-          type: 'url',
-          url: `${siteUrl}/assets/favicon.svg`
-        },
-        logo: {
-          type: 'url',
-          url: `${siteUrl}/assets/logo.svg`
-        }
-      },
-      metadata: {
+  metadata: {
         storefront: 'Alder & Cove'
       }
     });
