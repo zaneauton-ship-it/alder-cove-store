@@ -198,7 +198,18 @@ const App = (() => {
     return `★ ${rating.toFixed(1)}`;
   }
 
-  function productCard(product) {
+  
+
+  function wireAddToCart(scope = document) {
+    scope.querySelectorAll('[data-add-cart]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        btn.disabled = true;
+        await addToCart(btn.dataset.addCart, 1);
+        btn.disabled = false;
+      });
+    });
+  }
+function productCard(product) {
     const compare = product.compareAt
       ? `<span class="compare-price">${money(product.compareAt)}</span>`
       : '';
@@ -232,17 +243,6 @@ const App = (() => {
       </article>
     `;
   }
-
-  function wireAddToCart(scope = document) {
-    scope.querySelectorAll('[data-add-cart]').forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        btn.disabled = true;
-        await addToCart(btn.dataset.addCart, 1);
-        btn.disabled = false;
-      });
-    });
-  }
-
   async function updateCartUI() {
     const count = getCartCount();
     const countEl = document.querySelector('.cart-count');
